@@ -34,7 +34,10 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemHeaders;
 import org.apache.commons.fileupload.FileItemHeadersSupport;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.InvalidFileNameException;
 import org.apache.commons.fileupload.ParameterParser;
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 
@@ -52,9 +55,12 @@ import org.apache.commons.io.output.DeferredFileOutputStream;
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
  *
- * <p>When using the <code>DiskFileItemFactory</code>, then you should
- * consider the following: Temporary files are automatically deleted as
- * soon as they are no longer needed. (More precisely, when the
+ * <p>Temporary files, which are created for file items, should be
+ * deleted later on. The best way to do this is using a
+ * {@link FileCleaningTracker}, which you can set on the
+ * {@link DiskFileItemFactory}. However, if you do use such a tracker,
+ * then you must consider the following: Temporary files are automatically
+ * deleted as soon as they are no longer needed. (More precisely, when the
  * corresponding instance of {@link java.io.File} is garbage collected.)
  * This is done by the so-called reaper thread, which is started
  * automatically when the class {@link org.apache.commons.io.FileCleaner}
@@ -72,7 +78,7 @@ import org.apache.commons.io.output.DeferredFileOutputStream;
  *
  * @since FileUpload 1.1
  *
- * @version $Id: DiskFileItem.java 607869 2008-01-01 16:42:17Z jochen $
+ * @version $Id: DiskFileItem.java 963609 2010-07-13 06:56:47Z jochen $
  */
 public class DiskFileItem
     implements FileItem, FileItemHeadersSupport {
@@ -269,9 +275,13 @@ public class DiskFileItem
      * Returns the original filename in the client's filesystem.
      *
      * @return The original filename in the client's filesystem.
+     * @throws InvalidFileNameException The file name contains a NUL character,
+     *   which might be an indicator of a security attack. If you intend to
+     *   use the file name anyways, catch the exception and use
+     *   InvalidFileNameException#getName().
      */
     public String getName() {
-        return fileName;
+        return Streams.checkFileName(fileName);
     }
 
 

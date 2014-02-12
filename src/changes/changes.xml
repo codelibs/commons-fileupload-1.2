@@ -41,6 +41,47 @@ The <action> type attribute can be add,update,fix,remove.
   </properties>
 
   <body>
+    <release version="1.2.2" date="Not yet released">
+      <action dev="jochen" type="fix"
+          due-to="Daniel Fabian" due-to-email="dfabian@google.com">
+        Added a check for file names containing a NULL characters. Such file
+        names are now triggering an InvalidFileNameException since the file name
+        cannot be used as provided to create the file since it will be truncated
+        at the NUL character on most (all?) operating systems. E.g. a file name
+        like "test.foo0.bar" would result in "test.foo" being created.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-160"
+          due-to="Stepan Koltsov" due-to-email="yozh@mx1.ru">
+        Temporary files have not been deleted, if an error
+        occurred in FileUploadBase.parseRequest();
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-158"
+          due-to="Stepan Koltsov" due-to-email="yozh@mx1.ru">
+        Fixed example in MultipartStream Javadocs.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-157"
+          due-to="Paul Spurr" due-to-email="pspurr@gmail.com">
+        Ensured, that the ProgressListener is called for all
+        items.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-156">
+        Made the ProgressNotifier public.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-155"
+          due-to="J&#246;rg Heinicke" due-to-email="joerg.heinicke@gmx.de">
+        Multiple documentation fixes.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-152"
+          due-to="Duzakropka" due-to-email="duzakropka.@gmail.com">
+        Fixed the error message for FileSizeLimitExceededException
+        from "too many characters" to "too many bytes".
+      </action>
+      <action dev="jochen" type="add" issue="FILEUPLOAD-154">
+        A FileSizeLimitExceededException does now contain the
+        file and field name of the item, which caused the problem.
+      </action>
+    </release>
+
     <release version="1.2.1" date="2008-01-18">
       <action dev="jochen" type="fix">
         Upgrade to commons-io-1.4-SNAPSHOT, in order to use the new

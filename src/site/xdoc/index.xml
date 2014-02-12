@@ -49,9 +49,9 @@
           <li><a href="streaming.html">Streaming API</a></li>
           <li><a href="faq.html">Frequently Asked Questions</a></li>
           <li><a href="apidocs/index.html">JavaDoc API</a></li>
-          <li><a href="maven-reports.html">Project Reports</a></li>
+          <li><a href="project-reports.html">Project Reports</a></li>
         </ul>
-        You can also <a href="cvs-usage.html">browse</a> the Subversion repository.
+        You can also <a href="source-repository.html">browse</a> the Subversion repository.
       </p>
     </section>
 
@@ -61,7 +61,7 @@
             <strong>FileUpload 1.2.1</strong> - 18 January 2008
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/fileupload/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -69,7 +69,7 @@
             <strong>FileUpload 1.2</strong> - 13 February 2007
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/fileupload/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -77,7 +77,7 @@
             <strong>FileUpload 1.1.1</strong> - 08 June 2006
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/fileupload/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -85,7 +85,7 @@
             <strong>FileUpload 1.1</strong> - 22 Dec 2005
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/fileupload/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -93,7 +93,7 @@
             <strong>FileUpload 1.0</strong> - 24 Jun 2003
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/fileupload/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>

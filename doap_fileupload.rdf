@@ -7,7 +7,7 @@
     <category rdf:resource="http://projects.apache.org/category/library"/>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20"/>
     <bug-database rdf:resource="http://issues.apache.org/jira/browse/FILEUPLOAD"/>
-    <download-page rdf:resource="http://jakarta.apache.org/site/downloads/downloads_commons-fileupload.cgi"/>
+    <download-page rdf:resource="http://commons.apache.org/downloads/download_fileupload.cgi"/>
     <asfext:pmc rdf:resource="http://commons.apache.org/"/>
     <shortdesc xml:lang="en">File upload component for Java servlets</shortdesc>
     <description xml:lang="en">
@@ -22,16 +22,16 @@
       </SVNRepository>
     </repository>
     <release>
-      <revision>
+      <Version>
         <name>commons-fileupload</name>
         <created>2006-06-08</created>
-        <version>1.1.1</version>
-      </revision>
-      <revision>
+        <revision>1.1.1</revision>
+      </Version>
+      <Version>
         <name>commons-fileupload</name>
         <created>2005-12-23</created>
-        <version>1.1</version>
-      </revision>
+        <revision>1.1</revision>
+      </Version>
     </release>
     <mailing-list rdf:resource="http://commons.apache.org/mail-lists.html"/>
   </Project>

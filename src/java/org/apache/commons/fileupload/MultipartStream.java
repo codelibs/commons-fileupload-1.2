@@ -60,38 +60,36 @@ import org.apache.commons.fileupload.util.Streams;
  * <p>Here is an example of usage of this class.<br>
  *
  * <pre>
- *    try {
- *        MultipartStream multipartStream = new MultipartStream(input,
- *                                                              boundary);
- *        boolean nextPart = multipartStream.skipPreamble();
- *        OutputStream output;
- *        while(nextPart) {
- *            header = chunks.readHeader();
- *            // process headers
- *            // create some output stream
- *            multipartStream.readBodyPart(output);
- *            nextPart = multipartStream.readBoundary();
- *        }
- *    } catch(MultipartStream.MalformedStreamException e) {
- *          // the stream failed to follow required syntax
- *    } catch(IOException) {
- *          // a read or write error occurred
- *    }
- *
+ *   try {
+ *     MultipartStream multipartStream = new MultipartStream(input, boundary);
+ *     boolean nextPart = multipartStream.skipPreamble();
+ *     OutputStream output;
+ *     while(nextPart) {
+ *       String header = multipartStream.readHeaders();
+ *       // process headers
+ *       // create some output stream
+ *       multipartStream.readBodyData(output);
+ *       nextPart = multipartStream.readBoundary();
+ *     }
+ *   } catch(MultipartStream.MalformedStreamException e) {
+ *     // the stream failed to follow required syntax
+ *   } catch(IOException e) {
+ *     // a read or write error occurred
+ *   }
  * </pre>
  *
  * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author Sean C. Sullivan
  *
- * @version $Id: MultipartStream.java 607869 2008-01-01 16:42:17Z jochen $
+ * @version $Id: MultipartStream.java 735374 2009-01-18 02:18:45Z jochen $
  */
 public class MultipartStream {
     /**
      * Internal class, which is used to invoke the
      * {@link ProgressListener}.
      */
-    static class ProgressNotifier {
+	public static class ProgressNotifier {
         /** The listener to invoke.
          */
         private final ProgressListener listener;
@@ -127,6 +125,7 @@ public class MultipartStream {
          */
         void noteItem() {
             ++items;
+            notifyListener();
         }
         /** Called for notifying the listener.
          */
@@ -1004,70 +1003,4 @@ public class MultipartStream {
             return closed;
         }
     }
-
-    // ------------------------------------------------------ Debugging methods
-
-
-    // These are the methods that were used to debug this stuff.
-    /*
-
-    // Dump data.
-    protected void dump()
-    {
-        System.out.println("01234567890");
-        byte[] temp = new byte[buffer.length];
-        for(int i=0; i<buffer.length; i++)
-        {
-            if (buffer[i] == 0x0D || buffer[i] == 0x0A)
-            {
-                temp[i] = 0x21;
-            }
-            else
-            {
-                temp[i] = buffer[i];
-            }
-        }
-        System.out.println(new String(temp));
-        int i;
-        for (i=0; i<head; i++)
-            System.out.print(" ");
-        System.out.println("h");
-        for (i=0; i<tail; i++)
-            System.out.print(" ");
-        System.out.println("t");
-        System.out.flush();
-    }
-
-    // Main routine, for testing purposes only.
-    //
-    // @param args A String[] with the command line arguments.
-    // @throws Exception, a generic exception.
-    public static void main( String[] args )
-        throws Exception
-    {
-        File boundaryFile = new File("boundary.dat");
-        int boundarySize = (int)boundaryFile.length();
-        byte[] boundary = new byte[boundarySize];
-        FileInputStream input = new FileInputStream(boundaryFile);
-        input.read(boundary,0,boundarySize);
-
-        input = new FileInputStream("multipart.dat");
-        MultipartStream chunks = new MultipartStream(input, boundary);
-
-        int i = 0;
-        String header;
-        OutputStream output;
-        boolean nextChunk = chunks.skipPreamble();
-        while (nextChunk)
-        {
-            header = chunks.readHeaders();
-            System.out.println("!"+header+"!");
-            System.out.println("wrote part"+i+".dat");
-            output = new FileOutputStream("part"+(i++)+".dat");
-            chunks.readBodyData(output);
-            nextChunk = chunks.readBoundary();
-        }
-    }
-
-     */
 }
