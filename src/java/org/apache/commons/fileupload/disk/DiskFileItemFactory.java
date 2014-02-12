@@ -20,6 +20,8 @@ import java.io.File;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.io.FileCleaningTracker;
+
 
 /**
  * <p>The default {@link org.apache.commons.fileupload.FileItemFactory}
@@ -43,17 +45,18 @@ import org.apache.commons.fileupload.FileItemFactory;
  * consider the following: Temporary files are automatically deleted as
  * soon as they are no longer needed. (More precisely, when the
  * corresponding instance of {@link java.io.File} is garbage collected.)
- * This is done by the so-called reaper thread, which is started
- * automatically when the class {@link org.apache.commons.io.FileCleaner}
- * is loaded. It might make sense to terminate that thread, for example,
- * if your web application ends. See the section on "Resource cleanup"
+ * Cleaning up those files is done by an instance of
+ * {@link FileCleaningTracker}, and an associated thread. In a complex
+ * environment, for example in a web application, you should consider
+ * terminating this thread, for example, when your web application
+ * ends. See the section on "Resource cleanup"
  * in the users guide of commons-fileupload.</p>
  *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
  * @since FileUpload 1.1
  *
- * @version $Id: DiskFileItemFactory.java 502350 2007-02-01 20:42:48Z jochen $
+ * @version $Id: DiskFileItemFactory.java 607869 2008-01-01 16:42:17Z jochen $
  */
 public class DiskFileItemFactory implements FileItemFactory {
 
@@ -81,6 +84,13 @@ public class DiskFileItemFactory implements FileItemFactory {
     private int sizeThreshold = DEFAULT_SIZE_THRESHOLD;
 
 
+    /**
+     * <p>The instance of {@link FileCleaningTracker}, which is responsible
+     * for deleting temporary files.</p>
+     * <p>May be null, if tracking files is not required.</p>
+     */
+    private FileCleaningTracker fileCleaningTracker;
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -89,7 +99,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * may be configured by calling the appropriate setter methods.
      */
     public DiskFileItemFactory() {
-        // Does nothing.
+        this(DEFAULT_SIZE_THRESHOLD, null);
     }
 
 
@@ -107,7 +117,6 @@ public class DiskFileItemFactory implements FileItemFactory {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
-
 
     // ------------------------------------------------------------- Properties
 
@@ -182,14 +191,37 @@ public class DiskFileItemFactory implements FileItemFactory {
      *
      * @return The newly created file item.
      */
-    public FileItem createItem(
-            String fieldName,
-            String contentType,
-            boolean isFormField,
-            String fileName
-            ) {
-        return new DiskFileItem(fieldName, contentType,
+    public FileItem createItem(String fieldName, String contentType,
+            boolean isFormField, String fileName) {
+        DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
+        FileCleaningTracker tracker = getFileCleaningTracker();
+        if (tracker != null) {
+            tracker.track(result.getTempFile(), this);
+        }
+        return result;
     }
 
+
+    /**
+     * Returns the tracker, which is responsible for deleting temporary
+     * files.
+     * @return An instance of {@link FileCleaningTracker}, defaults to
+     *   {@link org.apache.commons.io.FileCleaner#getInstance()}. Null,
+     *   if temporary files aren't tracked.
+     */
+    public FileCleaningTracker getFileCleaningTracker() {
+        return fileCleaningTracker;
+    }
+
+    /**
+     * Returns the tracker, which is responsible for deleting temporary
+     * files.
+     * @param pTracker An instance of {@link FileCleaningTracker},
+     *   which will from now on track the created files. May be null
+     *   to disable tracking.
+     */
+    public void setFileCleaningTracker(FileCleaningTracker pTracker) {
+        fileCleaningTracker = pTracker;
+    }
 }

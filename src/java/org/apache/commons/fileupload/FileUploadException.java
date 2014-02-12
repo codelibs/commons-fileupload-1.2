@@ -24,7 +24,7 @@ import java.io.PrintWriter;
  * Exception for errors encountered while processing the request.
  *
  * @author <a href="mailto:jmcnally@collab.net">John McNally</a>
- * @version $Id: FileUploadException.java 479484 2006-11-27 01:06:53Z jochen $
+ * @version $Id: FileUploadException.java 551000 2007-06-27 00:59:16Z jochen $
  */
 public class FileUploadException extends Exception {
     /**
@@ -91,5 +91,9 @@ public class FileUploadException extends Exception {
             writer.println("Caused by:");
             cause.printStackTrace(writer);
         }
+    }
+
+    public Throwable getCause() {
+        return cause;
     }
 }

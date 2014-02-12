@@ -41,54 +41,84 @@ The <action> type attribute can be add,update,fix,remove.
   </properties>
 
   <body>
-	<release version="1.2" date="2007-02-13">
+    <release version="1.2.1" date="2008-01-18">
+      <action dev="jochen" type="fix">
+        Upgrade to commons-io-1.4-SNAPSHOT, in order to use the new
+        FileCleaningTracker and fix issues with FileCleaner.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-129">
+        Made the MockHttpServletRequest comply to the servlet 2.4 specification
+        by applying
+        http://www.sourcelabs.com/dashboards/sash-1.2/patches/commons-fileupload-1.1-1/SUP-520.diff
+      </action>
+      <action dev="jochen" type="add" issue="FILEUPLOAD-130"
+          due-to="Michael Macaluso" due-to-email="michael.public@wavecorp.com">
+        Added support for accessing the file item headers.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-116"
+          due-to="Amichai Rothman" due-to-email="amichai2@amichais.net">
+        A MalformedStreamException is now thrown, if the size of an items
+        headers exceeds HEADER_PART_SIZE_MAX;
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-134"
+          due-to="Thomas Vandahl" due-to-email="tv@apache.org">
+        DiskFileItem.toString() could throw an NPE.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-135"
+          due-to="Alexander Sova" due-to-email="bird@noir.crocodile.org">
+        Short files could cause an unexpected end of the item stream.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-145">
+        A FileSizeLimitExceededException was deferred until the complete
+        file has been uploaded. Additionally, the FileSizeLimitException
+        is now thrown immediately, if the attachments headers contain
+        a content-length value, which exceeds the configured limit.
+      </action>
+      <action dev="jochen" type="fix" issue="FILEUPLOAD-153"
+          due-to="Gary Gregory" due-to-email="ggregory@seagullsw.com">
+        Fixed a classpath problem when building with Sun JDK 1.3.1
+        and Ant.
+      </action>
+    </release>
 
+	<release version="1.2" date="2007-02-13">
       <action dev="jochen" type="fix" due-to="Aaron Freeman"
            due-to-email="aaron@sendthisfile.com">
         Made Streams.asString static.
       </action>
-
 	  <action dev="jochen" type="update" issue="FILEUPLOAD-109">
 	    Eliminated duplicate code.
 	  </action>
-
 	  <action dev="jochen" type="add" issue="FILEUPLOAD-112">
 	    Added a streaming API.
 	  </action>
-
 	  <action dev="jochen" type="fix" issue="FILEUPLOAD-93">
 	    Eliminated the necessity of a content-length header.
 	  </action>
-
       <action dev="jochen" type="fix" issue="FILEUPLOAD-108"
           due-to="Amichai Rothman" due-to-email="amichai2@amichais.net">
         Eliminated the limitation of a maximum size for a single
         header line. (The total size of all headers is already
         limited, so there's no need for another limit.)      
       </action>
-
       <action dev="jochen" type="add" issue="FILEUPLOAD-87">
         Added the ProgressListener, which allows to implement a
         progress bar.
       </action>
-
       <action dev="jochen" type="add" issue="FILEUPLOAD-111"
           due-to="Amichai Rothman" due-to-email="amichai2@amichais.net">
         Added support for header continuation lines.
       </action>
-
       <action dev="jochen" type="add" issue="FILEUPLOAD-88"
           due-to="Andrey Aristarkhov" due-to-email="aristarkhov@bitechnology.ru">
         It is now possible to limit the actual file size and not
         the request size.
       </action>
-
       <action dev="jochen" type="add" issue="FILEUPLOAD-120"
           due-to="Henry Yandell" due-to-email="bayard@apache.org">
         Added the FileCleanerCleanup as an example for how to close
         down the FileCleaner's reaper thread nicely.
       </action>
-
       <action dev="jochen" type="fix" issue="FILEUPLOAD-123">
         A descriptive NPE is now thrown, if the FileItemFactory
         has not been set.

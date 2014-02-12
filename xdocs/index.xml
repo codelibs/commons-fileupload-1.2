@@ -58,10 +58,18 @@
     <section name="Downloading">
         <subsection name='Full Releases'>
           <p>
+            <strong>FileUpload 1.2.1</strong> - 18 January 2008
+            <ul>
+              <li>Download the binary and source distributions from a mirror site
+                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
+              </li>
+            </ul>
+          </p>
+          <p>
             <strong>FileUpload 1.2</strong> - 13 February 2007
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://jakarta.apache.org/site/downloads/downloads_commons-fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -69,7 +77,7 @@
             <strong>FileUpload 1.1.1</strong> - 08 June 2006
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://jakarta.apache.org/site/downloads/downloads_commons-fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -77,7 +85,7 @@
             <strong>FileUpload 1.1</strong> - 22 Dec 2005
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://jakarta.apache.org/site/downloads/downloads_commons-fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -85,7 +93,7 @@
             <strong>FileUpload 1.0</strong> - 24 Jun 2003
             <ul>
               <li>Download the binary and source distributions from a mirror site
-                <a href='http://jakarta.apache.org/site/downloads/downloads_commons-fileupload.cgi'>here</a>
+                <a href='http://commons.apache.org/downloads/download_fileupload.cgi'>here</a>
               </li>
             </ul>
           </p>
@@ -102,14 +110,14 @@
             </p>
             <p>
             Download nightly builds from 
-            <a href='http://people.apache.org/builds/jakarta-commons/nightly/commons-fileupload/'>here</a>.
+            <a href='http://people.apache.org/builds/commons/nightly/commons-fileupload/'>here</a>.
             </p>
         </subsection>
     </section>
 
     <section name="Support">
       <p>
-        The <a href="mail-lists.html">Jakarta Commons mailing lists</a> act as
+        The <a href="mail-lists.html">Apache Commons mailing lists</a> act as
         the main support forum. The <em>user</em> list is suitable for most library
         usage queries. The <em>dev</em> list is intended for development discussion.
         Please remember that the lists are shared between all commons components,

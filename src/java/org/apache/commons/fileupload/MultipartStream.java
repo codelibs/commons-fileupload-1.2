@@ -84,7 +84,7 @@ import org.apache.commons.fileupload.util.Streams;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author Sean C. Sullivan
  *
- * @version $Id: MultipartStream.java 502350 2007-02-01 20:42:48Z jochen $
+ * @version $Id: MultipartStream.java 607869 2008-01-01 16:42:17Z jochen $
  */
 public class MultipartStream {
     /**
@@ -202,13 +202,6 @@ public class MultipartStream {
         CR, LF, DASH, DASH};
 
 
-    /**
-     * The number of bytes, over and above the boundary size, to use for the
-     * keep region.
-     */
-    private static final int KEEP_REGION_PAD = 3;
-
-
     // ----------------------------------------------------------- Data members
 
 
@@ -303,7 +296,8 @@ public class MultipartStream {
      *                 <code>encapsulations</code>.
      * @param bufSize  The size of the buffer to be used, in bytes.
      *
-     * @see #MultipartStream(InputStream, byte[], ProgressNotifier)
+     * @see #MultipartStream(InputStream, byte[],
+     *   MultipartStream.ProgressNotifier)
      * @deprecated Use {@link #MultipartStream(InputStream, byte[], int,
      *  org.apache.commons.fileupload.MultipartStream.ProgressNotifier)}.
      */
@@ -326,7 +320,8 @@ public class MultipartStream {
      * @param pNotifier The notifier, which is used for calling the
      *                  progress listener, if any.
      *
-     * @see #MultipartStream(InputStream, byte[], ProgressNotifier)
+     * @see #MultipartStream(InputStream, byte[],
+     *     MultipartStream.ProgressNotifier)
      */
     MultipartStream(InputStream input,
             byte[] boundary,
@@ -341,7 +336,7 @@ public class MultipartStream {
         // body-data tokens.
         this.boundary = new byte[boundary.length + BOUNDARY_PREFIX.length];
         this.boundaryLength = boundary.length + BOUNDARY_PREFIX.length;
-        this.keepRegion = boundary.length + KEEP_REGION_PAD;
+        this.keepRegion = this.boundary.length;
         System.arraycopy(BOUNDARY_PREFIX, 0, this.boundary, 0,
                 BOUNDARY_PREFIX.length);
         System.arraycopy(boundary, 0, this.boundary, BOUNDARY_PREFIX.length,
@@ -361,7 +356,8 @@ public class MultipartStream {
      * @param pNotifier An object for calling the progress listener, if any.
      *
      *
-     * @see #MultipartStream(InputStream, byte[], int, ProgressNotifier)
+     * @see #MultipartStream(InputStream, byte[], int,
+     *     MultipartStream.ProgressNotifier)
      */
     MultipartStream(InputStream input,
             byte[] boundary,
@@ -377,8 +373,9 @@ public class MultipartStream {
      *                 <code>encapsulations</code>.
      *
      * @deprecated Use {@link #MultipartStream(InputStream, byte[],
-     *  ProgressNotifier)}.
-     * @see #MultipartStream(InputStream, byte[], int, ProgressNotifier)
+     *  MultipartStream.ProgressNotifier)}.
+     * @see #MultipartStream(InputStream, byte[], int,
+     *  MultipartStream.ProgressNotifier)
      */
     public MultipartStream(InputStream input,
             byte[] boundary) {
@@ -421,8 +418,7 @@ public class MultipartStream {
      *
      * @throws IOException if there is no more data available.
      */
-    public byte readByte()
-    throws IOException {
+    public byte readByte() throws IOException {
         // Buffer depleted ?
         if (head == tail) {
             head = 0;
@@ -432,7 +428,9 @@ public class MultipartStream {
                 // No more data available.
                 throw new IOException("No more data is available");
             }
-            notifier.noteBytesRead(tail);
+            if (notifier != null) {
+                notifier.noteBytesRead(tail);
+            }
         }
         return buffer[head++];
     }
@@ -530,26 +528,27 @@ public class MultipartStream {
     public String readHeaders()
     throws MalformedStreamException {
         int i = 0;
-        byte[] b = new byte[1];
+        byte b;
         // to support multi-byte characters
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int sizeMax = HEADER_PART_SIZE_MAX;
         int size = 0;
         while (i < HEADER_SEPARATOR.length) {
             try {
-                b[0] = readByte();
+                b = readByte();
             } catch (IOException e) {
                 throw new MalformedStreamException("Stream ended unexpectedly");
             }
-            size++;
-            if (b[0] == HEADER_SEPARATOR[i]) {
+            if (++size > HEADER_PART_SIZE_MAX) {
+                throw new MalformedStreamException(
+                        "Header section has more than " + HEADER_PART_SIZE_MAX
+                        + " bytes (maybe it is not properly terminated)");
+            }
+            if (b == HEADER_SEPARATOR[i]) {
                 i++;
             } else {
                 i = 0;
             }
-            if (size <= sizeMax) {
-                baos.write(b[0]);
-            }
+            baos.write(b);
         }
 
         String headers = null;
@@ -576,7 +575,8 @@ public class MultipartStream {
      *
      * <p>Arbitrary large amounts of data can be processed by this
      * method using a constant size buffer. (see {@link
-     * #MultipartStream(InputStream,byte[],int, ProgressNotifier) constructor}).
+     * #MultipartStream(InputStream,byte[],int,
+     *   MultipartStream.ProgressNotifier) constructor}).
      *
      * @param output The <code>Stream</code> to write data into. May
      *               be null, in which case this method is equivalent
@@ -901,18 +901,33 @@ public class MultipartStream {
          * @throws IOException An I/O error occurred.
          */
         public void close() throws IOException {
+            close(false);
+        }
+
+        /**
+         * Closes the input stream.
+         * @param pCloseUnderlying Whether to close the underlying stream
+         *   (hard close)
+         * @throws IOException An I/O error occurred.
+         */
+        public void close(boolean pCloseUnderlying) throws IOException {
             if (closed) {
                 return;
             }
-            for (;;) {
-                int av = available();
-                if (av == 0) {
-                    av = makeAvailable();
+            if (pCloseUnderlying) {
+                closed = true;
+                input.close();
+            } else {
+                for (;;) {
+                    int av = available();
                     if (av == 0) {
-                        break;
+                        av = makeAvailable();
+                        if (av == 0) {
+                            break;
+                        }
                     }
+                    skip(av);
                 }
-                skip(av);
             }
             closed = true;
         }
@@ -956,18 +971,29 @@ public class MultipartStream {
 
             // Refill buffer with new data.
             head = 0;
-            int bytesRead = input.read(buffer, pad, bufSize - pad);
-            if (bytesRead == -1) {
-                // The last pad amount is left in the buffer.
-                // Boundary can't be in there so signal an error
-                // condition.
-                throw new MalformedStreamException(
-                "Stream ended unexpectedly");
+            tail = pad;
+
+            for (;;) {
+                int bytesRead = input.read(buffer, tail, bufSize - tail);
+                if (bytesRead == -1) {
+                    // The last pad amount is left in the buffer.
+                    // Boundary can't be in there so signal an error
+                    // condition.
+                    final String msg = "Stream ended unexpectedly";
+                    throw new MalformedStreamException(msg);
+                }
+                if (notifier != null) {
+                    notifier.noteBytesRead(bytesRead);
+                }
+                tail += bytesRead;
+
+                findSeparator();
+                int av = available();
+
+                if (av > 0 || pos != -1) {
+                    return av;
+                }
             }
-            notifier.noteBytesRead(bytesRead);
-            tail = pad + bytesRead;
-            findSeparator();
-            return available();
         }
 
         /**

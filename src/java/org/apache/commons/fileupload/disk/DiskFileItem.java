@@ -24,18 +24,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.FileCleaner;
-import org.apache.commons.io.output.DeferredFileOutputStream;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemHeaders;
+import org.apache.commons.fileupload.FileItemHeadersSupport;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ParameterParser;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.DeferredFileOutputStream;
 
 
 /**
@@ -56,7 +57,8 @@ import org.apache.commons.fileupload.ParameterParser;
  * soon as they are no longer needed. (More precisely, when the
  * corresponding instance of {@link java.io.File} is garbage collected.)
  * This is done by the so-called reaper thread, which is started
- * automatically when the class {@link FileCleaner} is loaded.
+ * automatically when the class {@link org.apache.commons.io.FileCleaner}
+ * is loaded.
  * It might make sense to terminate that thread, for example, if
  * your web application ends. See the section on "Resource cleanup"
  * in the users guide of commons-fileupload.</p>
@@ -70,12 +72,17 @@ import org.apache.commons.fileupload.ParameterParser;
  *
  * @since FileUpload 1.1
  *
- * @version $Id: DiskFileItem.java 482993 2006-12-06 09:42:01Z jochen $
+ * @version $Id: DiskFileItem.java 607869 2008-01-01 16:42:17Z jochen $
  */
 public class DiskFileItem
-    implements FileItem {
+    implements FileItem, FileItemHeadersSupport {
 
     // ----------------------------------------------------- Manifest constants
+
+    /**
+     * The UID to use when serializing this instance.
+     */
+    private static final long serialVersionUID = 2237570099615271025L;
 
 
     /**
@@ -159,10 +166,19 @@ public class DiskFileItem
     private transient DeferredFileOutputStream dfos;
 
     /**
+     * The temporary file to use.
+     */
+    private transient File tempFile;
+
+    /**
      * File to allow for serialization of the content of this item.
      */
     private File dfosFile;
 
+    /**
+     * The file items headers.
+     */
+    private FileItemHeaders headers;
 
     // ----------------------------------------------------------- Constructors
 
@@ -184,9 +200,9 @@ public class DiskFileItem
      *                      which files will be created, should the item size
      *                      exceed the threshold.
      */
-    public DiskFileItem(String fieldName, String contentType,
-            boolean isFormField, String fileName, int sizeThreshold,
-            File repository) {
+    public DiskFileItem(String fieldName,
+            String contentType, boolean isFormField, String fileName,
+            int sizeThreshold, File repository) {
         this.fieldName = fieldName;
         this.contentType = contentType;
         this.isFormField = isFormField;
@@ -561,7 +577,7 @@ public class DiskFileItem
      *         memory.
      */
     public File getStoreLocation() {
-        return dfos.getFile();
+        return dfos == null ? null : dfos.getFile();
     }
 
 
@@ -589,16 +605,18 @@ public class DiskFileItem
      * @return The {@link java.io.File File} to be used for temporary storage.
      */
     protected File getTempFile() {
-        File tempDir = repository;
-        if (tempDir == null) {
-            tempDir = new File(System.getProperty("java.io.tmpdir"));
+        if (tempFile == null) {
+            File tempDir = repository;
+            if (tempDir == null) {
+                tempDir = new File(System.getProperty("java.io.tmpdir"));
+            }
+
+            String tempFileName =
+                "upload_" + UID + "_" + getUniqueId() + ".tmp";
+
+            tempFile = new File(tempDir, tempFileName);
         }
-
-        String tempFileName = "upload_" + UID + "_" + getUniqueId() + ".tmp";
-
-        File f = new File(tempDir, tempFileName);
-        FileCleaner.track(f, this);
-        return f;
+        return tempFile;
     }
 
 
@@ -689,7 +707,6 @@ public class DiskFileItem
             output.write(cachedContent);
         } else {
             FileInputStream input = new FileInputStream(dfosFile);
-
             IOUtils.copy(input, output);
             dfosFile.delete();
             dfosFile = null;
@@ -699,4 +716,19 @@ public class DiskFileItem
         cachedContent = null;
     }
 
+    /**
+     * Returns the file item headers.
+     * @return The file items headers.
+     */
+    public FileItemHeaders getHeaders() {
+        return headers;
+    }
+
+    /**
+     * Sets the file item headers.
+     * @param pHeaders The file items headers.
+     */
+    public void setHeaders(FileItemHeaders pHeaders) {
+        headers = pHeaders;
+    }
 }
